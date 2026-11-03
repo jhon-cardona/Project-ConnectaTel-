@@ -1,6 +1,6 @@
 📱 Análisis de clientes de ConnectaTel
 
-Open In Colab
+
 
 Análisis de datos de una empresa de telecomunicaciones de Latinoamérica para entender cómo usan el servicio sus clientes y proponer mejoras a sus planes.
 
