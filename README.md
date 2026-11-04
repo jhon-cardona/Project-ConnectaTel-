@@ -1,80 +1,63 @@
-📱 Análisis de clientes de ConnectaTel
+📊 Análisis de clientes ConnectaTel
 
-
-
-Análisis de datos de una empresa de telecomunicaciones de Latinoamérica para entender cómo usan el servicio sus clientes y proponer mejoras a sus planes.
+Proyecto final del Sprint 7 (Bootcamp de Análisis de Datos). Análisis exploratorio, limpieza y segmentación de los clientes de ConnectaTel, una empresa de telecomunicaciones en Latinoamérica, usando datos de 2024.
 
 🎯 Objetivo
-Limpiar los datos y corregir errores.
-Resumir el uso de cada cliente (mensajes, llamadas y minutos).
-Agrupar a los clientes por edad y por nivel de uso.
-Detectar usos extremos (outliers).
-Dar recomendaciones al negocio.
-🗂️ Datos
 
-Son tres archivos CSV. El notebook los lee desde la carpeta /datasets/.
+Evaluar el comportamiento de los clientes para:
 
-Archivo	Qué contiene
-plans.csv	Los 2 planes: Básico ($12/mes) y Premium ($25/mes), con minutos, mensajes y GB incluidos.
-users_latam.csv	4 000 clientes: edad, ciudad, fecha de registro, plan y fecha de cancelación.
-usage.csv	40 000 registros de uso: llamadas (call) y mensajes (text). Cubre desde el 1 de enero hasta el 30 de junio de 2024.
-🔬 Qué se hizo
-Cargar y explorar los tres archivos.
-Buscar problemas de calidad: valores nulos, valores falsos que hacen de "dato desconocido" y fechas imposibles.
-Limpiar los datos:
-Edad -999 (55 filas): se reemplazó por la mediana.
-Ciudad "?" (96 filas): se convirtió en dato vacío.
-Fechas de registro fuera del periodo de los datos: se marcaron como vacías.
-Los vacíos en duration y length se dejaron así a propósito: un mensaje no tiene duración y una llamada no tiene longitud.
-Resumir el uso por cliente: cantidad de mensajes, de llamadas y total de minutos.
-Graficar la distribución de cada variable según el plan.
-Detectar outliers con diagramas de caja y el método IQR. Se mantuvieron porque son clientes muy activos, no errores.
-Segmentar clientes:
-Por uso: Bajo uso, Uso medio y Alto uso.
-Por edad: Joven (menos de 30), Adulto (30 a 59) y Adulto Mayor (60 o más).
-Redactar el análisis ejecutivo con hallazgos y recomendaciones.
-📊 Resultados principales
-Grupo	Clientes	%
-Uso medio	2 943	73.6 %
-Bajo uso	778	19.4 %
-Alto uso	279	7.0 %
-Adulto	2 018	50.4 %
-Adulto Mayor	1 222	30.6 %
-Joven	760	19.0 %
-Básico y Premium se usan casi igual: el plan no refleja cuánto consume cada cliente.
-El grupo Alto uso es el que más cancela (14.0 %, frente a cerca de 11.5 % en los otros dos), aunque es un grupo pequeño.
-Recomendaciones: mejorar el plan Premium, ofrecer un cambio de plan a los clientes de Alto uso en Básico, crear un plan económico para Bajo uso y cobrar por tramos los minutos extra.
+Construir un perfil estadístico de uso por usuario.
+Detectar comportamientos atípicos (outliers).
+Crear segmentos de clientes por nivel de uso y por edad.
+Proponer recomendaciones de planes y retención para el negocio.
+🗂️ Datasets
+Archivo	Contenido
+plans.csv	Planes disponibles (precio, minutos y GB incluidos, costo por extra). Solo 2 filas.
+users_latam.csv	4 000 clientes: edad, ciudad, fecha de registro, plan y fecha de cancelación (churn).
+usage.csv	40 000 registros de uso real: llamadas y mensajes (tipo, fecha, duración, longitud).
 
-El detalle completo está al final del notebook.
+Los CSV no están incluidos en el repositorio. El notebook los lee desde /datasets/, la ruta del entorno del bootcamp.
 
-▶️ Cómo ejecutarlo
-En Google Colab (lo más fácil)
-Haz clic en el botón Open In Colab de arriba.
-Sube los tres archivos CSV desde el panel de archivos de la izquierda.
-Cambia las rutas de la celda de carga (por ejemplo '/datasets/users_latam.csv' por 'users_latam.csv').
-Ve a Entorno de ejecución > Ejecutar todo.
-En tu computadora
+🧪 Etapas del análisis
+Carga y exploración: lectura de los 3 datasets, shape, info() y vista previa.
+Calidad de datos: nulos, valores centinela y fechas imposibles.
+Limpieza
+age: el centinela -999 se reemplaza por la mediana.
+city: el "?" se convierte en nulo.
+reg_date: solo las fechas del año 2026 (imposibles) pasan a NaT. Los registros válidos de 2024 se conservan.
+duration y length: los nulos son MAR (dependen de type), por lo que se dejan como nulos.
+Estadísticas por usuario: se agrega usage por user_id (mensajes, llamadas y minutos) y se une a users con un left merge. El usuario sin actividad queda con 0 en las tres métricas (fillna(0)).
+Visualización: histogramas por plan (hue='plan') y boxplots.
+Outliers: método IQR con límite superior y porcentaje de outliers sobre el total válido. Se mantienen porque son valores plausibles de usuarios muy activos.
+Segmentación
+Por uso (grupo_uso): Bajo uso, Uso medio y Alto uso, según llamadas y mensajes.
+Por edad (grupo_edad): Joven (< 30), Adulto (30–59) y Adulto Mayor (60 o más).
+Insight ejecutivo: problemas de datos, segmentos, valor para el negocio, outliers y recomendaciones.
+🔍 Hallazgos principales
+Calidad de datos: 55 centinelas en age, 565 ciudades sin dato (469 nulos y 96 "?") y 40 fechas de registro en 2026.
+Uso típico: medianas de 5 mensajes, 4 llamadas y ~19.8 minutos por usuario. La mayoría de los clientes (~74 %) es de Uso medio.
+Planes: Básico y Premium se comportan casi igual en edad y uso.
+Edad: la distribución es casi uniforme entre 18 y 79 años. Los Adultos de 30 a 59 son la mitad de la base.
+Outliers: solo en el extremo superior de mensajes, llamadas y minutos. Los minutos tienen la cola más larga, por eso conviene reportar la mediana.
+Recomendaciones: rediseñar Premium, ofrecer upgrade a usuarios de Alto uso en Básico, un programa de retención para Alto uso, un plan económico para Bajo uso, cobro escalonado por minutos extra y mejorar la captura de city y age.
+🛠️ Tecnologías
+
+Python 3 · pandas · seaborn · matplotlib · Jupyter Notebook
+
+▶️ Cómo ejecutar el notebook
+Clona el repositorio:
 bash
-pip install pandas seaborn matplotlib jupyter
-jupyter notebook
-
-Abre el notebook y ejecuta las celdas de arriba hacia abajo.
-
-✅ Para comprobar que todo salió bien
-users['age'].min() da 18 (ya no -999).
-users['city'].isna().sum() da 565.
-user_profile['grupo_uso'].value_counts() da 2 943, 778 y 279.
-user_profile['grupo_edad'].value_counts() da 2 018, 1 222 y 760.
-⚠️ Limitaciones
-Los datos de uso cubren solo el primer semestre de 2024.
-Un cliente sin registros de uso quedó clasificado como Alto uso. Se arregla con fillna(0) en las tres métricas antes de clasificar. Afecta a 1 de 4 000 clientes.
-No hay datos de ingresos, así que el valor de cada grupo se estima por su consumo.
-No se cruzó la edad con el nivel de uso.
-📁 Estructura sugerida
-.
-├── README.md
-├── notebooks/
-│   └── connectatel_analisis.ipynb
+   git clone https://github.com/jhon-cardona/Project-ConnectaTel-.git
+   cd Project-ConnectaTel-
+Instala las dependencias:
+bash
+   pip install pandas seaborn matplotlib jupyter
+Coloca plans.csv, users_latam.csv y usage.csv en una carpeta datasets/, o cambia las rutas /datasets/... del notebook por las tuyas.
+Abre el notebook (jupyter notebook) o súbelo a Google Colab y ejecuta las celdas en orden con Run all.
+📁 Estructura
+Project-ConnectaTel-/
+├── S7_Version-Estudiante-Project-ConnectaTel.ipynb   # análisis completo
+└── README.md
 └── datasets/
     ├── plans.csv
     ├── users_latam.csv
